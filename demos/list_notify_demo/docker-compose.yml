@@ -1,0 +1,50 @@
+name: listen-notify-demo
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: pg
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"  # optional: expose to host for psql/debugging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb || exit 1"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  listener:
+    build: ./listener
+    container_name: listener
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: appdb
+      DB_USER: app
+      DB_PASSWORD: app
+      CHANNEL: work_ready
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notifier:
+    build: ./notifier
+    container_name: notifier
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: appdb
+      DB_USER: app
+      DB_PASSWORD: app
+      CHANNEL: work_ready
+      INTERVAL_SECONDS: 2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped

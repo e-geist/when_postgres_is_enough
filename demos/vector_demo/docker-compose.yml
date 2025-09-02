@@ -1,0 +1,31 @@
+name: vector_demo
+services:
+  db:
+    image: tensorchord/vchord-postgres:pg17-v0.5.0
+    container_name: vchord-db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build: ./app
+    container_name: vchord-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: appdb
+      DB_USER: postgres
+      DB_PASSWORD: postgres
