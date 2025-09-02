@@ -29,6 +29,13 @@ ___
 
 Thank you!
 
+Questions?
+
+Slides + Demos:
+
+![](img/github_qr_code.png) <!-- .element: style="height: 300px;" -->
+
+
 - [eugengeist.com](https://eugengeist.com)
 - [mail@eugengeist.com](mailto:mail@eugengeist.com)
 - [https://linkedin.com/in/eugen-geist/](https://linkedin.com/in/eugen-geist/)
